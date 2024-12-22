@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ツイートアナリティクス - メインページ</title>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@YourTwitterAccount">
+    <meta name="twitter:title" content="ツイートアナリティクス - メインページ">
+    <meta name="twitter:description" content="ツイートアナリティクスのデータ分析を行うためのツールです。">
+    <meta name="twitter:image" content="image.jpeg">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            max-width: 600px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        input, button, a {
+            font-size: 16px;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            display: inline-block;
+        }
+        input {
+            border: 1px solid #ccc;
+            width: auto;
+            padding: 5px 10px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        a {
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            padding: 10px 20px;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+        button {
+            cursor: pointer;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ツイートアナリティクス</h1>
+
+    <h2>ツイートアクティビティからCSVデータをダウンロードしてください</h2>
+    <p>自分のIDを@から入力するとURLが作成されます。そこからCSVをダウンロードした後、ポストアナリティクスへ進んでください。</p>
+    <form id="urlForm">
+        <label for="inputId">ID（例: @FFBuncho）</label><br>
+        <input type="text" id="inputId" placeholder="@FFBuncho" required>
+        <br>
+        <button type="submit">作成</button>
+    </form>
+    <div id="output" class="output" style="display: none;">
+        <p><strong>ツイートアクティビティ:</strong> <a href="#" id="tweetUrl" target="_blank"></a></p>
+    </div>
+
+    <h2>他の操作</h2>
+    <a href="tweet_analytics.html">ポストアナリティクス</a>
+
+    <script>
+        document.getElementById('urlForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const inputId = document.getElementById('inputId').value.trim();
+
+            if (!inputId.startsWith('@')) {
+                alert('IDは"@"で始めてください。例: @FFBuncho');
+                return;
+            }
+
+            const username = inputId.slice(1); // Remove "@"
+            const tweetUrl = `https://ads.x.com/user/${username}/tweets/`;
+
+            document.getElementById('tweetUrl').textContent = tweetUrl;
+            document.getElementById('tweetUrl').href = tweetUrl;
+
+            document.getElementById('output').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
