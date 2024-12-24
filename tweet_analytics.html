@@ -193,7 +193,7 @@
     </style>
 </head>
 <body>
-    <header>ツイートアナリティクスVer.1.4.1</header>
+    <header>ツイートアナリティクスVer.1.4.2</header>
 
     <div class="back-button">
         <a href="index.html">メインページに戻る</a>
@@ -241,19 +241,7 @@
         let allTweets = [];
         let filteredTweets = [];
 
-        // ▼ プラットフォーム判定 (navigator.platform) で Mac/iPhone/iPad → 'MacOrIOS'、それ以外→ 'Others'
-        function detectPlatform() {
-            const pf = navigator.platform.toLowerCase();
-
-            if (pf.includes('mac')) {
-                return 'MacOrIOS';
-            } else if (pf.includes('iphone') || pf.includes('ipad') || pf.includes('ipod')) {
-                return 'MacOrIOS';
-            } else {
-                return 'Others';
-            }
-        }
-
+        // プラットフォーム判定関数は廃止し、常に UTF-8 で取り込む方向に変更
         function processCSV() {
             const fileInput = document.getElementById('csvFile');
             const file = fileInput.files[0];
@@ -262,19 +250,13 @@
                 return;
             }
 
-            // ▼ Mac・iPhone・iPad は Shift_JIS、それ以外は UTF-8
-            const platform = detectPlatform();
-            let encoding;
-            if (platform === 'MacOrIOS') {
-                encoding = 'Shift_JIS';
-            } else {
-                encoding = 'UTF-8';
-            }
+            // ▼ 常に UTF-8 で読み込む
+            const encoding = 'UTF-8';
 
             Papa.parse(file, {
-                encoding: encoding, // エンコーディングを分岐
+                encoding: encoding,
                 skipEmptyLines: true,
-                newline: "\n", // 改行コードの統一
+                newline: "\n",
                 complete: function(results) {
                     const rows = results.data;
                     if (!rows || rows.length < 2) {
@@ -282,7 +264,7 @@
                         return;
                     }
 
-                    console.log("プラットフォーム:", platform, "エンコーディング:", encoding);
+                    console.log("エンコーディング:", encoding);
 
                     // カラム番号を固定で定義
                     const tweetIDColIndex = 0;               // "ツイートID"
@@ -302,7 +284,7 @@
                     const mediaPlaybackColIndex = 20;        // "メディアの再生数"
                     const mediaEngagementColIndex = 21;      // "メディアのエンゲージメント数"
 
-                    // コールバック内でグローバルを再利用するように修正
+                    // ここでグローバルを再利用するように修正
                     allTweets = [];
 
                     for (let i = 1; i < rows.length; i++) {
