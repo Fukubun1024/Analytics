@@ -193,7 +193,7 @@
     </style>
 </head>
 <body>
-    <header>ツイートアナリティクスVer.1.3.1</header>
+    <header>ツイートアナリティクスVer.1.4</header>
 
     <div class="back-button">
         <a href="index.html">メインページに戻る</a>
@@ -241,6 +241,18 @@
         let allTweets = [];
         let filteredTweets = [];
 
+        // プラットフォーム判定関数をグローバルに定義
+        function detectPlatform() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            if (/mac|iphone|ipad|ipod/.test(userAgent)) {
+                return 'Mac';
+            } else if (/windows|android/.test(userAgent)) {
+                return 'Windows';
+            } else {
+                return 'Unknown';
+            }
+        }
+
         function processCSV() {
             const fileInput = document.getElementById('csvFile');
             const file = fileInput.files[0];
@@ -249,9 +261,14 @@
                 return;
             }
 
+            // プラットフォームに応じたエンコーディングを設定
+            const platform = detectPlatform();
+            const encoding = platform === 'Mac' ? 'UTF-16' : 'UTF-8';
+
             Papa.parse(file, {
-                encoding: "UTF-8",
+                encoding: encoding, // 動的にエンコードを切り替え
                 skipEmptyLines: true,
+                newline: "\n", // 改行コードの統一
                 complete: function(results) {
                     const rows = results.data;
                     if (!rows || rows.length < 2) {
@@ -259,24 +276,29 @@
                         return;
                     }
 
-                    // カラム番号を固定で定義
-                    const tweetColIndex = 2;    // "ツイート本文"
-                    const timeColIndex = 3;     // "時間"
-                    const linkColIndex = 1;     // "ツイートの固定リンク"
-                    const impressionsColIndex = 4; // "インプレッション"
-                    const engagementColIndex = 5;  // "エンゲージメント"
-                    const engagementRateColIndex = 6; // "エンゲージメント率"
-                    const retweetColIndex = 7;  // "リツイート"
-                    const replyColIndex = 8;    // "返信"
-                    const likeColIndex = 9;     // "いいね"
-                    const profileClickColIndex = 10; // "ユーザープロフィールクリック"
-                    const urlClickColIndex = 11;    // "URLクリック数"
-                    const detailsClickColIndex = 12; // "詳細クリック"
-                    const mediaEngagementColIndex = 13; // "メディアのエンゲージメント数"
-                    const mediaPlaybackColIndex = 14; // "メディアの再生数"
-                    const hashtagClickColIndex = 15; // "ハッシュタグクリック"
+                    console.log("プラットフォーム:", platform, "エンコーディング:", encoding);
 
+                    // カラム番号を固定で定義
+                    const tweetIDColIndex = 0;               // "ツイートID"
+                    const linkColIndex = 1;                  // "ツイートの固定リンク"
+                    const tweetColIndex = 2;                 // "ツイート本文"
+                    const timeColIndex = 3;                  // "時間"
+                    const impressionsColIndex = 4;           // "インプレッション"
+                    const engagementColIndex = 5;            // "エンゲージメント"
+                    const engagementRateColIndex = 6;        // "エンゲージメント率"
+                    const retweetColIndex = 7;               // "リツイート"
+                    const replyColIndex = 8;                 // "返信"
+                    const likeColIndex = 9;                  // "いいね"
+                    const profileClickColIndex = 10;         // "ユーザープロフィールクリック"
+                    const urlClickColIndex = 11;             // "URLクリック数"
+                    const hashtagClickColIndex = 12;         // "ハッシュタグクリック"
+                    const detailsClickColIndex = 13;         // "詳細クリック"
+                    const mediaPlaybackColIndex = 20;        // "メディアの再生数"
+                    const mediaEngagementColIndex = 21;      // "メディアのエンゲージメント数"
+
+                    // ★ コールバック内でグローバルを再利用するように修正
                     allTweets = [];
+
                     for (let i = 1; i < rows.length; i++) {
                         const row = rows[i];
                         
@@ -330,11 +352,13 @@
                             console.warn(`行 ${i + 1} がスキップ（数値変換エラー）:`, row, e);
                         }
                     }
-if (allTweets.length === 0) {
-    alert("CSVから有効なツイートデータを取得できませんでした。");
-    return;
-}
-console.log(`取り込み完了: 有効データ ${allTweets.length} 件 / 総データ ${rows.length - 1} 件`);
+
+                    if (allTweets.length === 0) {
+                        alert("CSVから有効なツイートデータを取得できませんでした。");
+                        return;
+                    }
+                    console.log(`取り込み完了: 有効データ ${allTweets.length} 件 / 総データ ${rows.length - 1} 件`);
+
                     // 最小/最大日時を取り出して画面に表示
                     const minDate = new Date(Math.min(...allTweets.map(t => t.rawTime)));
                     const maxDate = new Date(Math.max(...allTweets.map(t => t.rawTime)));
@@ -354,8 +378,6 @@ console.log(`取り込み完了: 有効データ ${allTweets.length} 件 / 総�
                 }
             });
         }
-
-
 
         // ▼ ソート処理 (既存ロジックはほぼそのまま)
         function sortByDropdown(criteria = null) {
