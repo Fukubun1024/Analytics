@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ツイートアナリティクスVer.1.2</title>
+    <title>ツイートアナリティクスVer.1.3</title>
 
     <style>
     /* ---- ここから既存のCSSはそのまま ---- */
@@ -193,7 +193,7 @@
     </style>
 </head>
 <body>
-    <header>ツイートアナリティクス</header>
+    <header>ツイートアナリティクスVer.1.3</header>
 
     <div class="back-button">
         <a href="index.html">メインページに戻る</a>
@@ -267,21 +267,22 @@
                     const headers = rows[0].map(h => h.trim());
 
                     // 必要なカラムのインデックスを探す
-                    const tweetColIndex = headers.findIndex(h => h.includes("ツイート本文"));
-                    const timeColIndex = headers.findIndex(h => h.includes("時間"));
-                    const linkColIndex = headers.findIndex(h => h.includes("ツイートの固定リンク"));
-                    const impressionsColIndex = headers.findIndex(h => h.includes("インプレッション"));
-                    const engagementColIndex = headers.findIndex(h => h.includes("エンゲージメント"));
-                    const engagementRateColIndex = headers.findIndex(h => h.includes("エンゲージメント率"));
-                    const retweetColIndex = headers.findIndex(h => h.includes("リツイート"));
-                    const replyColIndex = headers.findIndex(h => h.includes("返信"));
-                    const likeColIndex = headers.findIndex(h => h.includes("いいね"));
-                    const profileClickColIndex = headers.findIndex(h => h.includes("ユーザープロフィールクリック"));
-                    const urlClickColIndex = headers.findIndex(h => h.includes("URLクリック数"));
-                    const detailsClickColIndex = headers.findIndex(h => h.includes("詳細クリック"));
-                    const mediaEngagementColIndex = headers.findIndex(h => h.includes("メディアのエンゲージ"));
-                    const mediaPlaybackColIndex = headers.findIndex(h => h.includes("メディアの再生数"));
-                    const hashtagClickColIndex = headers.findIndex(h => h.includes("ハッシュタグクリック"));
+                        const tweetColIndex = headers.findIndex(h => h === "ツイート本文");
+                        const timeColIndex = headers.findIndex(h => h === "時間");
+                        const linkColIndex = headers.findIndex(h => h === "ツイートの固定リンク");
+                        const impressionsColIndex = headers.findIndex(h => h === "インプレッション");
+                        const engagementColIndex = headers.findIndex(h => h === "エンゲージメント");
+                        const engagementRateColIndex = headers.findIndex(h => h === "エンゲージメント率");
+                        const retweetColIndex = headers.findIndex(h => h === "リツイート");
+                        const replyColIndex = headers.findIndex(h => h === "返信");
+                        const likeColIndex = headers.findIndex(h => h === "いいね");
+                        const profileClickColIndex = headers.findIndex(h => h === "ユーザープロフィールクリック");
+                        const urlClickColIndex = headers.findIndex(h => h === "URLクリック数");
+                        const detailsClickColIndex = headers.findIndex(h => h === "詳細クリック");
+                        const mediaEngagementColIndex = headers.findIndex(h => h === "メディアのエンゲージメント数");
+                        const mediaPlaybackColIndex = headers.findIndex(h => h === "メディアの再生数");
+                        const hashtagClickColIndex = headers.findIndex(h => h === "ハッシュタグクリック");
+
 
                     // 必須カラムが見つからない場合は警告
                     if (
