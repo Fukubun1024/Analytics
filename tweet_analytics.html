@@ -193,7 +193,7 @@
     </style>
 </head>
 <body>
-    <header>ツイートアナリティクスVer.1.4</header>
+    <header>ツイートアナリティクスVer.1.4.1</header>
 
     <div class="back-button">
         <a href="index.html">メインページに戻る</a>
@@ -241,15 +241,16 @@
         let allTweets = [];
         let filteredTweets = [];
 
-        // プラットフォーム判定関数をグローバルに定義
+        // ▼ プラットフォーム判定 (navigator.platform) で Mac/iPhone/iPad → 'MacOrIOS'、それ以外→ 'Others'
         function detectPlatform() {
-            const userAgent = navigator.userAgent.toLowerCase();
-            if (/mac|iphone|ipad|ipod/.test(userAgent)) {
-                return 'Mac';
-            } else if (/windows|android/.test(userAgent)) {
-                return 'Windows';
+            const pf = navigator.platform.toLowerCase();
+
+            if (pf.includes('mac')) {
+                return 'MacOrIOS';
+            } else if (pf.includes('iphone') || pf.includes('ipad') || pf.includes('ipod')) {
+                return 'MacOrIOS';
             } else {
-                return 'Unknown';
+                return 'Others';
             }
         }
 
@@ -261,12 +262,17 @@
                 return;
             }
 
-            // プラットフォームに応じたエンコーディングを設定
+            // ▼ Mac・iPhone・iPad は Shift_JIS、それ以外は UTF-8
             const platform = detectPlatform();
-            const encoding = platform === 'Mac' ? 'UTF-16' : 'UTF-8';
+            let encoding;
+            if (platform === 'MacOrIOS') {
+                encoding = 'Shift_JIS';
+            } else {
+                encoding = 'UTF-8';
+            }
 
             Papa.parse(file, {
-                encoding: encoding, // 動的にエンコードを切り替え
+                encoding: encoding, // エンコーディングを分岐
                 skipEmptyLines: true,
                 newline: "\n", // 改行コードの統一
                 complete: function(results) {
@@ -296,7 +302,7 @@
                     const mediaPlaybackColIndex = 20;        // "メディアの再生数"
                     const mediaEngagementColIndex = 21;      // "メディアのエンゲージメント数"
 
-                    // ★ コールバック内でグローバルを再利用するように修正
+                    // コールバック内でグローバルを再利用するように修正
                     allTweets = [];
 
                     for (let i = 1; i < rows.length; i++) {
