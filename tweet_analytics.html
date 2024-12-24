@@ -289,40 +289,42 @@ button:active {
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const csvData = e.target.result;
+                const csvData = e.target.result.replace(/\r\n|\r|\n/g, '\n'); // 改行コードを統一
+
 
                 const rows = [];
                 let currentRow = [];
                 let inQuotes = false;
                 let currentField = '';
 
-                csvData.split(/\r?\n/).forEach((line) => {
-                    for (const char of line) {
-                        if (char === '"') {
-                            inQuotes = !inQuotes;
-                        } else if (char === ',' && !inQuotes) {
-                            currentRow.push(currentField.trim());
-                            currentField = '';
-                        } else {
-                            currentField += char;
-                        }
-                    }
+csvData.split('\n').forEach((line) => {
+    for (const char of line) {
+        if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            currentRow.push(currentField.trim());
+            currentField = '';
+        } else {
+            currentField += char;
+        }
+    }
 
-                    if (!inQuotes) {
-                        currentRow.push(currentField.trim());
-                        rows.push(currentRow);
-                        currentRow = [];
-                        currentField = '';
-                    } else {
-                        currentField += '\n';
-                    }
-                });
+    if (!inQuotes) {
+        currentRow.push(currentField.trim());
+        rows.push(currentRow);
+        currentRow = [];
+        currentField = '';
+    } else {
+        currentField += '\n';
+    }
+});
 
                 if (inQuotes) {
                     console.warn('警告: 未完了のフィールドが存在');
                 }
 
-                const headers = rows[0];
+               const headers = rows[0].map(header => header.trim()); // ヘッダーをトリムして柔軟に対応
+
 
                 const tweetColIndex = headers.findIndex(header => header.includes("ツイート本文"));
                 const timeColIndex = headers.findIndex(header => header.includes("時間"));
@@ -407,7 +409,8 @@ button:active {
                 sortByDropdown();
             };
 
-            reader.readAsText(file);
+            reader.readAsText(file, 'UTF-8');
+
         }
 
 function sortByDropdown(criteria = null) {
