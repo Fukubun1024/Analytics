@@ -193,7 +193,7 @@
     </style>
 </head>
 <body>
-    <header>ツイートアナリティクスVer.1.3</header>
+    <header>ツイートアナリティクスVer.1.3.1</header>
 
     <div class="back-button">
         <a href="index.html">メインページに戻る</a>
@@ -241,7 +241,6 @@
         let allTweets = [];
         let filteredTweets = [];
 
-        // ▼ CSV取り込み（Papa Parse版）
         function processCSV() {
             const fileInput = document.getElementById('csvFile');
             const file = fileInput.files[0];
@@ -249,10 +248,7 @@
                 alert("CSVファイルを選択してください！");
                 return;
             }
-            // iOSでファイルがちゃんと選択できているかを確認
-            console.log("選択されたファイル:", file.name);
 
-            // Papa ParseでCSVをパース
             Papa.parse(file, {
                 encoding: "UTF-8",
                 skipEmptyLines: true,
@@ -263,109 +259,82 @@
                         return;
                     }
 
-                    // 先頭行をヘッダー行として取得
-                    const headers = rows[0].map(h => h.trim());
+                    // カラム番号を固定で定義
+                    const tweetColIndex = 2;    // "ツイート本文"
+                    const timeColIndex = 3;     // "時間"
+                    const linkColIndex = 1;     // "ツイートの固定リンク"
+                    const impressionsColIndex = 4; // "インプレッション"
+                    const engagementColIndex = 5;  // "エンゲージメント"
+                    const engagementRateColIndex = 6; // "エンゲージメント率"
+                    const retweetColIndex = 7;  // "リツイート"
+                    const replyColIndex = 8;    // "返信"
+                    const likeColIndex = 9;     // "いいね"
+                    const profileClickColIndex = 10; // "ユーザープロフィールクリック"
+                    const urlClickColIndex = 11;    // "URLクリック数"
+                    const detailsClickColIndex = 12; // "詳細クリック"
+                    const mediaEngagementColIndex = 13; // "メディアのエンゲージメント数"
+                    const mediaPlaybackColIndex = 14; // "メディアの再生数"
+                    const hashtagClickColIndex = 15; // "ハッシュタグクリック"
 
-                    // 必要なカラムのインデックスを探す
-                        const tweetColIndex = headers.findIndex(h => h === "ツイート本文");
-                        const timeColIndex = headers.findIndex(h => h === "時間");
-                        const linkColIndex = headers.findIndex(h => h === "ツイートの固定リンク");
-                        const impressionsColIndex = headers.findIndex(h => h === "インプレッション");
-                        const engagementColIndex = headers.findIndex(h => h === "エンゲージメント");
-                        const engagementRateColIndex = headers.findIndex(h => h === "エンゲージメント率");
-                        const retweetColIndex = headers.findIndex(h => h === "リツイート");
-                        const replyColIndex = headers.findIndex(h => h === "返信");
-                        const likeColIndex = headers.findIndex(h => h === "いいね");
-                        const profileClickColIndex = headers.findIndex(h => h === "ユーザープロフィールクリック");
-                        const urlClickColIndex = headers.findIndex(h => h === "URLクリック数");
-                        const detailsClickColIndex = headers.findIndex(h => h === "詳細クリック");
-                        const mediaEngagementColIndex = headers.findIndex(h => h === "メディアのエンゲージメント数");
-                        const mediaPlaybackColIndex = headers.findIndex(h => h === "メディアの再生数");
-                        const hashtagClickColIndex = headers.findIndex(h => h === "ハッシュタグクリック");
-
-
-                    // 必須カラムが見つからない場合は警告
-                    if (
-                        tweetColIndex === -1 || timeColIndex === -1 || linkColIndex === -1 ||
-                        impressionsColIndex === -1 || engagementColIndex === -1 ||
-                        engagementRateColIndex === -1 || retweetColIndex === -1 ||
-                        replyColIndex === -1 || likeColIndex === -1 || profileClickColIndex === -1 ||
-                        urlClickColIndex === -1 || detailsClickColIndex === -1 ||
-                        mediaEngagementColIndex === -1 || mediaPlaybackColIndex === -1 ||
-                        hashtagClickColIndex === -1
-                    ) {
-                        alert("CSVのカラム名が正しくありません。ヘッダーを確認してください。");
-                        return;
-                    }
-
-                    // ヘッダー以降のデータ行をオブジェクトに変換
                     allTweets = [];
                     for (let i = 1; i < rows.length; i++) {
                         const row = rows[i];
-                        if (row.length < headers.length) {
-                            // 行のカラム数が足りない場合はスキップ
-                            console.warn(`行 ${i+1} が不完全:`, row);
+                        
+                        // スキップする場合の理由をチェック
+                        if (row.length < 16) {
+                            console.warn(`行 ${i + 1} が不完全（カラム数不足）:`, row);
                             continue;
                         }
 
                         const timeUTC = row[timeColIndex];
                         if (!timeUTC) {
-                            console.warn(`行 ${i+1} - 日時データが無効:`, row);
+                            console.warn(`行 ${i + 1} がスキップ（時間データが空）:`, row);
                             continue;
                         }
 
-                        // 時間をUTC → JSTに変換
                         const date = new Date(timeUTC + " UTC");
                         if (isNaN(date.getTime())) {
-                            console.warn(`行 ${i+1} - 無効な日時: ${timeUTC}`);
+                            console.warn(`行 ${i + 1} がスキップ（無効な日時フォーマット: ${timeUTC})`, row);
                             continue;
                         }
+
+                        // 時間をUTCからJSTに変換
                         const jstDate = new Date(date.getTime() + 9 * 60 * 60 * 1000);
                         const formattedTime = jstDate.toISOString().slice(0, 16)
                             .replace("T", " ")
                             .replace(/-/g, "/");
 
-                        // 数値系はパースしておく
-                        const impressionsVal = parseInt(row[impressionsColIndex], 10) || 0;
-                        const engagementVal = parseInt(row[engagementColIndex], 10) || 0;
-                        const engagementRateVal = row[engagementRateColIndex]
-                            ? (parseFloat(row[engagementRateColIndex]) * 100).toFixed(2) + "%"
-                            : "0%";
-                        const retweetVal = parseInt(row[retweetColIndex], 10) || 0;
-                        const replyVal = parseInt(row[replyColIndex], 10) || 0;
-                        const likeVal = parseInt(row[likeColIndex], 10) || 0;
-                        const profileClickVal = parseInt(row[profileClickColIndex], 10) || 0;
-                        const urlClickVal = parseInt(row[urlClickColIndex], 10) || 0;
-                        const detailsClickVal = parseInt(row[detailsClickColIndex], 10) || 0;
-                        const mediaEngagementVal = parseInt(row[mediaEngagementColIndex], 10) || 0;
-                        const mediaPlaybackVal = parseInt(row[mediaPlaybackColIndex], 10) || 0;
-                        const hashtagClickVal = parseInt(row[hashtagClickColIndex], 10) || 0;
-
-                        allTweets.push({
-                            tweet: row[tweetColIndex] || "N/A",
-                            time: formattedTime,
-                            link: row[linkColIndex] || "#",
-                            impressions: impressionsVal,
-                            engagement: engagementVal,
-                            engagementRate: engagementRateVal,
-                            retweet: retweetVal,
-                            reply: replyVal,
-                            like: likeVal,
-                            profileClick: profileClickVal,
-                            urlClick: urlClickVal,
-                            detailsClick: detailsClickVal,
-                            mediaEngagement: mediaEngagementVal,
-                            mediaPlayback: mediaPlaybackVal,
-                            hashtagClick: hashtagClickVal,
-                            rawTime: jstDate
-                        });
+                        // 数値系のフィールドをチェックしつつパース
+                        try {
+                            allTweets.push({
+                                tweet: row[tweetColIndex] || "N/A",
+                                time: formattedTime,
+                                link: row[linkColIndex] || "#",
+                                impressions: parseInt(row[impressionsColIndex], 10) || 0,
+                                engagement: parseInt(row[engagementColIndex], 10) || 0,
+                                engagementRate: row[engagementRateColIndex]
+                                    ? (parseFloat(row[engagementRateColIndex]) * 100).toFixed(2) + "%"
+                                    : "0%",
+                                retweet: parseInt(row[retweetColIndex], 10) || 0,
+                                reply: parseInt(row[replyColIndex], 10) || 0,
+                                like: parseInt(row[likeColIndex], 10) || 0,
+                                profileClick: parseInt(row[profileClickColIndex], 10) || 0,
+                                urlClick: parseInt(row[urlClickColIndex], 10) || 0,
+                                detailsClick: parseInt(row[detailsClickColIndex], 10) || 0,
+                                mediaEngagement: parseInt(row[mediaEngagementColIndex], 10) || 0,
+                                mediaPlayback: parseInt(row[mediaPlaybackColIndex], 10) || 0,
+                                hashtagClick: parseInt(row[hashtagClickColIndex], 10) || 0,
+                                rawTime: jstDate
+                            });
+                        } catch (e) {
+                            console.warn(`行 ${i + 1} がスキップ（数値変換エラー）:`, row, e);
+                        }
                     }
-
-                    if (allTweets.length === 0) {
-                        alert("CSVから有効なツイートデータを取得できませんでした。");
-                        return;
-                    }
-
+if (allTweets.length === 0) {
+    alert("CSVから有効なツイートデータを取得できませんでした。");
+    return;
+}
+console.log(`取り込み完了: 有効データ ${allTweets.length} 件 / 総データ ${rows.length - 1} 件`);
                     // 最小/最大日時を取り出して画面に表示
                     const minDate = new Date(Math.min(...allTweets.map(t => t.rawTime)));
                     const maxDate = new Date(Math.max(...allTweets.map(t => t.rawTime)));
@@ -385,6 +354,8 @@
                 }
             });
         }
+
+
 
         // ▼ ソート処理 (既存ロジックはほぼそのまま)
         function sortByDropdown(criteria = null) {
