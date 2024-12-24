@@ -4,58 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ツイートアナリティクス - メインページ</title>
-        <!-- Twitterカード用メタタグ -->
+    <!-- Twitterカード用メタタグ -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="X IDアクティビティリンク作成ツール">
     <meta name="twitter:description" content="XのIDを入力してツイートやビデオアクティビティリンクを簡単に作成！">
     <meta name="twitter:image" content="https://github.com/Fukubun1024/Analytics/blob/main/image.jpg?raw=true">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            max-width: 600px;
-            line-height: 1.5;
-            text-align: center;
-        }
-        input, button, a {
-            font-size: 16px;
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            display: inline-block;
-        }
-        input {
-            border: 1px solid #ccc;
-            width: auto;
-            padding: 5px 10px;
-            box-sizing: border-box;
-        }
-        input:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-        a {
-            text-decoration: none;
-            color: white;
-            background-color: #007bff;
-            padding: 10px 20px;
-        }
-        a:hover {
-            background-color: #0056b3;
-        }
-        button {
-            cursor: pointer;
-        }
-        .output {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f4f4f4;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
+
+<style>
+/* 全体の背景 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 500px; /* PCでも幅を狭く */
+    line-height: 1.5;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+/* ヘッダー */
+h1, h2 {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+/* 入力、ボタン、リンクのスタイル */
+input, button, a {
+    font-size: 16px;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    display: inline-block;
+}
+
+input {
+    border: 1px solid #ccc;
+    width: 85%; /* 幅を調整 */
+    padding: 10px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    padding: 10px 0;
+    display: inline-block;
+    margin: 10px auto;
+    width: 85%; /* ボタンと同じ幅に設定 */
+    text-align: center;
+}
+
+a:hover {
+    background-color: #0056b3;
+}
+
+button {
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    width: 85%; /* ボタン幅を揃える */
+    padding: 10px 0;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* 出力エリア */
+.output {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: left;
+    font-size: 14px;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 600px) {
+    body {
+        margin: 5px;
+        padding: 10px;
+        max-width: 100%; /* スマホでは幅を広げすぎない */
+    }
+    h1, h2 {
+        font-size: 1.5em;
+    }
+    input, button, a {
+        font-size: 14px;
+        width: 90%; /* スマホ用に幅をさらに狭く */
+    }
+    input {
+        text-align: center;
+    }
+    a {
+        margin: 10px 0;
+    }
+}
+</style>
+
+
+
 </head>
 <body>
     <h1>ツイートアナリティクス</h1>
